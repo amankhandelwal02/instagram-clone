@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.iconBtn {
+    transition: all .2s ease-in-out;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.iconBtn:hover {
+    transform: scale(1.5);
+}
+
+@layer components {
+    .para {
+        @apply text-xs w-14 truncate text-center
+    }
+}
+
+@layer components {
+    .img {
+        @apply space-x-2 scrollbar-thin scrollbar-thumb-black
+    }
+}
+
+.postBtn {
+    transition: all .2s ease-in-out;
+    margin: 12px;
+    cursor: pointer;
+}
+
+.postBtn:hover {
+    transform: scale(1.5);
+}
+
+
