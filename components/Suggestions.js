@@ -32,6 +32,10 @@ width: 45px;
 border-radius: 50px;
 padding: 2px;
 border: 2px solid gray;
+
+:hover {
+  cursor: pointer;
+}
 `
 
 const SuggestedUserInfo = styled.div`

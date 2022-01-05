@@ -8,7 +8,7 @@ import SendIcon from "@mui/icons-material/Send";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { useSession } from "next-auth/react";
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
   addDoc,
   collection,
@@ -19,9 +19,11 @@ import {
   serverTimestamp,
   setDoc,
   doc,
+  where,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import Moment from "react-moment";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Post = ({ userImg, postImg, username, id, caption }) => {
   const { data: session } = useSession();
@@ -59,14 +61,18 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
   );
 
   const postLike = async () => {
-      if (hasLiked) {
-            await deleteDoc(doc(db, "posts", id, "likes", session.user.uid))
-      } else {
+    if (hasLiked) {
+      await deleteDoc(doc(db, "posts", id, "likes", session.user.uid));
+    } else {
+      await setDoc(doc(db, "posts", id, "likes", session.user.uid), {
+        username: session.user.username,
+      });
+    }
+  };
 
-          await setDoc(doc(db, "posts", id, "likes", session.user.uid), {
-            username: session.user.username,
-          });
-      }
+  const deletePost = async () => {
+
+    await deleteDoc(doc(db, "posts", id));
   };
 
   const sendComment = async (e) => {
@@ -88,6 +94,14 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
       <PostHead>
         <UserImage src={userImg} height="50px" width="50px" />
         <p className="flex-1 font-bold">{username}</p>
+        {session ? (
+          <IconButton>
+            <DeleteIcon
+              onClick={deletePost}
+              className=":hover cursor-pointer text-red-500"
+            />
+          </IconButton>
+        ) : null}
         <IconButton>
           <MoreHorizIcon />
         </IconButton>
@@ -100,14 +114,14 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
       {session && (
         <PostIcon>
           <div>
-              {
-                  hasLiked ? (
-                    <FavoriteIcon onClick={postLike} className="postBtn text-red-500" />
-                  ) : (
-
-                      <FavoriteBorderIcon onClick={postLike} className="postBtn" />
-                  )
-              }
+            {hasLiked ? (
+              <FavoriteIcon
+                onClick={postLike}
+                className="postBtn text-red-500"
+              />
+            ) : (
+              <FavoriteBorderIcon onClick={postLike} className="postBtn" />
+            )}
 
             <ChatBubbleOutlineIcon className="postBtn" />
 
@@ -119,9 +133,11 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
 
       <PostCaption>
         <p className="p-4 truncate">
-            {likes.length > 0 && (
-                <p className="font-bold mb-1">{likes.length} {likes.length < 0 ? "likes" : "like"}</p>
-            )}
+          {likes.length > 0 && (
+            <p className="font-bold mb-1">
+              {likes.length} {likes.length > 1 ? "likes" : "like"}
+            </p>
+          )}
           <span className="font-bold mr-2">{username} </span>
           {caption}
         </p>
@@ -132,7 +148,7 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
           {comments.map((comment) => (
             <div key={comment.id} className="flex items-center space-x-2 mb-3">
               <Image
-                className="h-11 rounded-full"
+                className="h-11 rounded-full :hover cursor-pointer"
                 src={comment.data().userImage}
                 alt=""
               />
@@ -150,7 +166,7 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
 
       {session && (
         <PostComment className="flex p-4 items-center">
-          <EmojiEmotionsIcon />
+          <EmojiEmotionsIcon className=":hover cursor-pointer" />
           <input
             value={comment}
             onChange={(e) => setComment(e.target.value)}
@@ -163,7 +179,7 @@ const Post = ({ userImg, postImg, username, id, caption }) => {
             type="submit"
             disabled={!comment.trim()}
             onClick={sendComment}
-            className="font-bold text-blue-400"
+            className="font-bold text-blue-400 :hover cursor-pointer"
           >
             Post
           </button>
@@ -191,6 +207,10 @@ const UserImage = styled.img`
   padding: 2px;
   border: 2px solid gray;
   margin-right: 15px;
+
+  :hover {
+    cursor: pointer;
+  }
 `;
 
 const PostImg = styled.div``;
